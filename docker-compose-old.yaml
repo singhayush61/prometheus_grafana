@@ -35,21 +35,17 @@ services:
       - ./shared/logs:/var/log   
     depends_on:
       - loki   
-  alloy:
-    image: grafana/alloy:latest
-    command: run /etc/alloy/config.alloy
-    volumes:
-      - alloy-config:/etc/alloy
-    depends_on:
-      - init-alloy
-    restart: unless-stopped
 
-  init-alloy:
-    image: busybox:latest
+  alloy:
+    image: grafana/alloy:latest  
+    command:
+      - "-config.file=/etc/alloy/config.alloy"  
     volumes:
-      - alloy-config:/etc/alloy
-    command: ['sh', '-c', 'wget -O /etc/alloy/config.alloy https://raw.githubusercontent.com/aussiearef/grafana-udemy/main/alloy/config.alloy || exit 1']
-    restart: "on-failure"
+      - ./shared/alloy:/etc/alloy
+    ports:
+      - "4317:4317"  
+      - "4318:4318"  
+    entrypoint: sh -c "apt-get update -y && apt-get -y install wget && wget --no-check-certificate -O /etc/alloy/config.alloy https://raw.githubusercontent.com/aussiearef/grafana-udemy/main/alloy/config.alloy && exec /bin/alloy run /etc/alloy/config.alloy"
 
   grafana:
     image: grafana/grafana:latest
@@ -63,7 +59,27 @@ services:
       - "3000:3000"
     entrypoint: sh -c "wget --no-check-certificate -O /etc/grafana/provisioning/datasources/datasources.yml https://raw.githubusercontent.com/aussiearef/grafana-udemy/main/grafana/datasources.yml && exec sh /run.sh"
 
-  volumes:
-    prometheus-data:
-    tempo-data:
-    
+  shoehub:
+    image: aussiearef/shoehub
+    ports:
+      - "8001:8080"
+
+  orderservice:
+    image: aussiearef/orderservice
+  
+  paymentservice:
+    image: aussiearef/paymentservice
+  
+  stimulator:
+    image: aussiearef/stimulator
+    depends_on:
+      - orderservice
+      - paymentservice 
+
+  
+
+
+
+volumes:
+  prometheus-data:
+  tempo-data:

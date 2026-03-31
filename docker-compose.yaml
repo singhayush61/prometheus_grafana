@@ -49,5 +49,10 @@ services:
     platform: linux/amd64
     ports:
       - "8001:8080"
+# ... (all your services above)
 
+volumes:
+  prometheus-data:
+  tempo-data:
+  loki-data:
   # ... (orderservice, paymentservice, stimulator remain the same)
