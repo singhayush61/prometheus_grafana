@@ -1,0 +1,97 @@
+services:
+  tempo:
+    image: grafana/tempo:latest
+    platform: linux/arm64
+    volumes:
+      - ./shared/tempo:/etc/tempo-config
+      - tempo-data:/var/tempo
+    ports:
+      - "4320:4317"
+    # Optimized: Removed 'sh' entrypoint because Tempo image is distroless (no shell)
+    # This assumes you have downloaded tempo.yml to ./shared/tempo/
+    command: [ "-config.file=/etc/tempo-config/tempo.yml" ]
+
+  prometheus:
+    image: prom/prometheus:latest
+    platform: linux/arm64
+    volumes:
+      - ./shared/prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    # Optimized: Using local config to avoid startup delays
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-remote-write-receiver"
+
+  loki:
+    image: grafana/loki:latest
+    platform: linux/arm64
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./shared/loki:/etc/loki
+      - loki-data:/loki
+
+  promtail:
+    image: grafana/promtail:latest
+    platform: linux/arm64
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - ./shared/promtail:/etc/promtail
+      - ./shared/logs:/var/log
+    depends_on:
+      - loki
+
+  alloy:
+    image: grafana/alloy:latest
+    platform: linux/arm64
+    volumes:
+      - ./shared/alloy:/etc/alloy
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    # Optimized: Removed 'apt-get'/ 'wget' entrypoint for faster M2 startup
+    command: [ "run", "/etc/alloy/config.alloy", "--storage.path=/var/lib/alloy/data" ]
+
+  grafana:
+    image: grafana/grafana:latest
+    platform: linux/arm64
+    volumes:
+      - ./shared/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    ports:
+      - "3000:3000"
+
+  # --- Microservices (Using Rosetta/AMD64) ---
+  shoehub:
+    image: aussiearef/shoehub
+    platform: linux/amd64
+    ports:
+      - "8001:8080"
+
+  orderservice:
+    image: aussiearef/orderservice
+    platform: linux/amd64
+
+  paymentservice:
+    image: aussiearef/paymentservice
+    platform: linux/amd64
+
+  stimulator:
+    image: aussiearef/stimulator
+    platform: linux/amd64
+    depends_on:
+      - orderservice
+      - paymentservice
+
+# CRITICAL: All named volumes must be declared here
+volumes:
+  prometheus-data:
+  tempo-data:
+  loki-data:
