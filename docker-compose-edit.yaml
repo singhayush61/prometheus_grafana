@@ -63,8 +63,7 @@ services:
       - "3000:3000"
     entrypoint: sh -c "wget --no-check-certificate -O /etc/grafana/provisioning/datasources/datasources.yml https://raw.githubusercontent.com/aussiearef/grafana-udemy/main/grafana/datasources.yml && exec sh /run.sh"
 
-
-volumes:
-  prometheus-data:
-  tempo-data:
-  alloy-config:
+  volumes:
+    prometheus-data:
+    tempo-data:
+    
