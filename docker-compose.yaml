@@ -3,12 +3,11 @@ services:
     image: grafana/tempo:latest
     platform: linux/arm64
     volumes:
-      - ./shared/tempo:/etc/tempo-config
+      - ./shared/tempo/tempo.yml:/etc/tempo-config/tempo.yml:ro
       - tempo-data:/var/tempo
     ports:
-      - "3200:3200"   # HTTP
-      - "4320:4317"   # OTLP gRPC (Alloy sends here)
-      - "4321:4318"   # OTLP HTTP
+      - "3200:3200"   # HTTP API
+      - "4320:4317"   # OTLP gRPC
     command: [ "-config.file=/etc/tempo-config/tempo.yml" ]
 
   prometheus:
@@ -42,10 +41,12 @@ services:
   promtail:
     image: grafana/promtail:latest
     platform: linux/arm64
-    command: -config.file=/etc/promtail/config.yml
     volumes:
+      # Map the folder containing the config
       - ./shared/promtail:/etc/promtail
+      # Map the folder containing the logs you want to scrape
       - ./shared/logs:/var/log
+    command: -config.file=/etc/promtail/config.yml
     depends_on:
       - loki
 
