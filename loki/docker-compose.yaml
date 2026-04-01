@@ -39,7 +39,7 @@ services:
     networks:
       - grafana-net
     ports:
-      - "9091:9090"
+      - "9090:9090"
     restart: unless-stopped
 
   loki:
