@@ -2,14 +2,17 @@ server:
   http_listen_port: 3200
 
 distributor:
-  otlp:
-    protocols:
-      grpc:
-      http:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: "0.0.0.0:4317"
+        http:
+          endpoint: "0.0.0.0:4318"
 
 ingester:
   trace_idle_period: 10s
-  trace_flush_threshold: 1mb
+  # trace_flush_threshold and max_trace_segments are removed
 
 storage:
   trace:
