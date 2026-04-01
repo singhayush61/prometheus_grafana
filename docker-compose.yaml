@@ -6,9 +6,9 @@ services:
       - ./shared/tempo:/etc/tempo-config
       - tempo-data:/var/tempo
     ports:
-      - "4320:4317"
-    # Optimized: Removed 'sh' entrypoint because Tempo image is distroless (no shell)
-    # This assumes you have downloaded tempo.yml to ./shared/tempo/
+      - "3200:3200"   # HTTP
+      - "4320:4317"   # OTLP gRPC (Alloy sends here)
+      - "4321:4318"   # OTLP HTTP
     command: [ "-config.file=/etc/tempo-config/tempo.yml" ]
 
   prometheus:
@@ -30,11 +30,15 @@ services:
     platform: linux/arm64
     ports:
       - "3100:3100"
+      - "9096:9096"
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./shared/loki:/etc/loki
       - loki-data:/loki
-
+    deploy:
+      resources:
+        limits:
+          memory: 512M
   promtail:
     image: grafana/promtail:latest
     platform: linux/arm64
