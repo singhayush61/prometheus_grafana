@@ -8,15 +8,8 @@ distributor:
       http:
 
 ingester:
-  lifecycler:
-    address: 127.0.0.1
-    final_sleep: 0s
-    join_after: 0s
-    observe_period: 0s
-    num_tokens: 1
   trace_idle_period: 10s
   trace_flush_threshold: 1mb
-  max_trace_segments: 1000
 
 storage:
   trace:
