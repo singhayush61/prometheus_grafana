@@ -55,8 +55,16 @@ services:
       - "3100:3100"
     restart: unless-stopped
 
+  tempo-init:
+    image: alpine
+    command: ['sh', '-c', 'mkdir -p /tmp/tempo/blocks && chmod -R 777 /tmp/tempo']
+    volumes:
+      - tempo_data:/tmp/tempo
+    restart: "no"
   tempo:
     image: grafana/tempo:2.7.0
+    depends_on:
+      - tempo-init
     container_name: tempo
     volumes:
       - ./tempo-config.yaml:/etc/tempo/config.yaml
