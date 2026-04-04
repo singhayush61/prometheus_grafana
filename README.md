@@ -11,3 +11,4 @@ curl -L -o ./shared/tempo/tempo.yml https://raw.githubusercontent.com/aussiearef
 curl -L -o ./shared/prometheus/prometheus.yml https://raw.githubusercontent.com/aussiearef/grafana-udemy/main/prometheus/prometheus.yml
 curl -L -o ./shared/alloy/config.alloy https://raw.githubusercontent.com/aussiearef/grafana-udemy/main/alloy/config.alloy
 curl -L -o ./shared/grafana/provisioning/datasources/datasources.yml https://raw.githubusercontent.com/aussiearef/grafana-udemy/main/grafana/datasources.yml
+
