@@ -76,8 +76,6 @@ services:
       - orderservice
       - paymentservice 
 
-
-
 volumes:
   prometheus-data:
   tempo-data:
