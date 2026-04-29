@@ -3,9 +3,7 @@ before running docker compose -f docker-compose-new-optimized up -d
 
 run
 
-
 Bash
-
 
 mkdir -p ./shared/tempo ./shared/prometheus ./shared/loki ./shared/alloy ./shared/grafana/provisioning/datasources
 
